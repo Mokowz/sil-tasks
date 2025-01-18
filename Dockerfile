@@ -9,7 +9,8 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     gcc \
-    python3-dev
+    python3-dev \
+    netcat-traditional
 
 COPY requirements.txt requirements.txt
 
@@ -21,4 +22,4 @@ EXPOSE 8000
 
 RUN chmod +x django_run.sh
 
-ENTRYPOINT [ "/booksApp/django_run.sh" ]
+ENTRYPOINT [ "./django_run.sh" ]
