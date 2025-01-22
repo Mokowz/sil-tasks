@@ -25,3 +25,13 @@
   - name: Install Postgresql
     apt:
       name: postgres
+      state: latest
+      update_cache: true
+
+  - name: Enable and Run Postgres
+    service:
+      name: postgres
+      enabled: true
+      state: reloaded
+
+- name: 
