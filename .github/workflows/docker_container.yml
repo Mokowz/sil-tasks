@@ -1,16 +1,54 @@
 name: Deploy to EC2 defined in task 3
 
 on:
-  push
+  push:
+  workflow_dispatch:
 
 jobs:
+  # Job 1 (Build and Tag the Docker Image)
   build_and_push_dockerhub:
+    name: Build Docker Image
     runs-on: ubuntu-latest
 
     steps: 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4.2.2
 
-      - name: Build, tag and push Image
-        run: |
-          docker build
+      - name: Build Docker Image
+        run: docker compose build
+
+  # Job 2 (Test the Image by running it)
+  test_image:
+    name: Test Docker Image by Running
+    runs-on: ubuntu-latest
+    needs: build_and_push_dockerhub
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4.2.2
+
+      - name: Run the Image
+        run: docker compose up -d
+
+  # Job 3 (Push to Docker Hub)
+  push_to_hub:
+    name: Push Docker Image to hub
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4.2.2
+
+      - name: Login to Docker Registry
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push and Tag image to dockerhub
+        uses: docker/build-push-action@v6.12.0
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/books-only-app:latest
