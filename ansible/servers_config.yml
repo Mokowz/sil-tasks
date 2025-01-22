@@ -1,6 +1,6 @@
 ---
 - name: Copy config file to the server
-  hosts: servers
+  hosts: server
   become: true
 
   tasks:
@@ -24,7 +24,7 @@
       dest: /opt/config.txt
 
 - name: Configure Postgresql
-  hosts: servers
+  hosts: server
   become: true
 
   tasks:
@@ -41,7 +41,7 @@
       state: started
 
 - name: Configure Nginx
-  hosts: servers
+  hosts: server
   become: true
 
   tasks:

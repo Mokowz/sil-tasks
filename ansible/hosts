@@ -1,5 +1,3 @@
 [server]
+35.174.136.198
 
-
-[all:vars]
-private_key_path=/home/ronny/Desktop/Deep-Devops/.keys/aws-login.pem
