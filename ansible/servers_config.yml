@@ -10,12 +10,18 @@
         sudo addgroup devops
         sudo adduser ubuntu devops
 
+  - name: Create /opt directory if it doesn't exist
+    file:
+      path: /opt
+      state: directory
+      mode: 0755
+
   - name: Copy the config.txt file to the server
     copy:
       src: config.txt
       group: devops
-      mode: 
-      dest: /opt/
+      mode: 0660
+      dest: /opt/config.txt
 
 - name: Configure Postgresql
   hosts: servers
@@ -24,14 +30,29 @@
   tasks:
   - name: Install Postgresql
     apt:
-      name: postgres
+      name: postgresql
       state: latest
       update_cache: true
 
   - name: Enable and Run Postgres
     service:
-      name: postgres
+      name: postgresql
+      enabled: true
+      state: started
+
+- name: Configure Nginx
+  hosts: servers
+  become: true
+
+  tasks:
+  - name: Install Nginx
+    apt:
+      name: nginx
+      state: latest
+      update_cache: true
+
+  - name: Configure Nginx
+    service:
+      name: nginx
       enabled: true
       state: reloaded
-
-- name: 
