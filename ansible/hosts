@@ -1,0 +1,5 @@
+[server]
+
+
+[all:vars]
+private_key_path=/home/ronny/Desktop/Deep-Devops/.keys/aws-login.pem

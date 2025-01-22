@@ -1,0 +1,27 @@
+---
+- name: Copy config file to the server
+  hosts: servers
+  become: true
+
+  tasks:
+  - name: Create Devops Group
+    shell:
+      cmd: |
+        sudo addgroup devops
+        sudo adduser ubuntu devops
+
+  - name: Copy the config.txt file to the server
+    copy:
+      src: config.txt
+      group: devops
+      mode: 
+      dest: /opt/
+
+- name: Configure Postgresql
+  hosts: servers
+  become: true
+
+  tasks:
+  - name: Install Postgresql
+    apt:
+      name: postgres

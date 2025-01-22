@@ -1,1 +1,16 @@
+name: Deploy to EC2 defined in task 3
 
+on:
+  push
+
+jobs:
+  build_and_push_dockerhub:
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build, tag and push Image
+        run: |
+          docker build
