@@ -75,6 +75,13 @@ resource "aws_security_group" "test_sec_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port = 0
     to_port = 0
@@ -83,10 +90,27 @@ resource "aws_security_group" "test_sec_group" {
   }
 }
 
+# Create a private key
+resource "tls_private_key" "sil_private_key" {
+  algorithm = "RSA"
+  rsa_bits = 4096
+}
+
+# Link local ssh to instance
+resource "aws_key_pair" "test_key" {
+  key_name = "test-key"
+  public_key = tls_private_key.sil_private_key.public_key_openssh
+
+  provisioner "local-exec" {
+    command = "echo '${tls_private_key.sil_private_key.private_key_pem}' > ~/Desktop/Deep-Devops/.keys/test_pkey.pem"
+  }
+}
+
 resource "aws_instance" "books_server" {
   ami       = "ami-04b4f1a9cf54c11d0"
   instance_type = "t2.micro"
   security_groups = [aws_security_group.test_sec_group.id]
+  key_name = aws_key_pair.test_key.key_name
   subnet_id = aws_subnet.test_subnet.id
 
   tags = {
