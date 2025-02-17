@@ -27,7 +27,7 @@ resource "aws_subnet" "test_subnet" {
   cidr_block = "10.0.1.0/24"
 }
 
-# Create an internet gatewat
+# Create an internet gateway
 resource "aws_internet_gateway" "test_igw" {
   vpc_id = aws_vpc.test_vpc.id
 }
@@ -38,7 +38,7 @@ resource "aws_route_table" "test_rt" {
   vpc_id = aws_vpc.test_vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block = "0.0.0.0/0"  # Allow traffic to go anywhere
     gateway_id = aws_internet_gateway.test_igw.id
   }
 }
@@ -76,6 +76,20 @@ resource "aws_security_group" "test_sec_group" {
   }
 
   ingress {
+    from_port = 9090
+    to_port   = 9090
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port = 3000
+    to_port   = 3000
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     from_port = 22
     to_port   = 22
     protocol  = "tcp"
@@ -96,11 +110,12 @@ resource "tls_private_key" "sil_private_key" {
   rsa_bits = 4096
 }
 
-# Link local ssh to instance
+# Pair the key
 resource "aws_key_pair" "test_key" {
   key_name = "test-key"
   public_key = tls_private_key.sil_private_key.public_key_openssh
 
+  # Store it locally
   provisioner "local-exec" {
     command = "echo '${tls_private_key.sil_private_key.private_key_pem}' > ~/Desktop/Deep-Devops/.keys/test_pkey.pem"
   }
