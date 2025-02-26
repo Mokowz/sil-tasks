@@ -5,22 +5,21 @@
 
   tasks:
   - name: Create Devops Group
-    shell:
-      cmd: |
-        sudo addgroup devops
-        sudo adduser ubuntu devops
+    group:
+      name: devops
+      state: present
 
-  - name: Create /opt directory if it doesn't exist
-    file:
-      path: /opt
-      state: directory
-      mode: 0755
+  - name: Add user to Devops Group
+    user:
+      name: ubuntu
+      append: true
+      groups: devops
 
   - name: Copy the config.txt file to the server
     copy:
       src: config.txt
       group: devops
-      mode: 0660
+      mode: 0060
       dest: /opt/config.txt
 
 - name: Configure Postgresql
@@ -34,7 +33,7 @@
       state: latest
       update_cache: true
 
-  - name: Enable and Run Postgres
+  - name: Enable and Run Postgres Service
     service:
       name: postgresql
       enabled: true
@@ -51,7 +50,7 @@
       state: latest
       update_cache: true
 
-  - name: Configure Nginx
+  - name: Enable and Run Nginx Service
     service:
       name: nginx
       enabled: true

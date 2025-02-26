@@ -1,7 +1,7 @@
 groups:
   - name: django_alerts
     rules:
-      # HTTP Request Latency
+      # Response time
       - alert: HighRequestLatency
         expr: rate(django_http_requests_latency_seconds_sum[5m]) > 1
         for: 5m
@@ -30,3 +30,13 @@ groups:
         annotations:
           summary: "High error rate detected"
           description: "More than 10% of requests are resulting in 5xx errors"
+
+      # Total Requests
+      - alert: TooManyRequests
+        expr: rate(http_requests_total[5m]) > 100 
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High request rate detected"
+          description: "The number of requests has exceeded 100 per 5 minutes over the past 1 minute."

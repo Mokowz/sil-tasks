@@ -1,0 +1,66 @@
+---
+- name: Install Docker on The Ubuntu Server
+  hosts: server
+  become: true
+  tags: install
+
+  tasks:
+  - name: Install Required Packages
+    apt:
+      name:
+        - apt-transport-https
+        - curl
+        - ca-certificates
+        - gnupg
+        - software-properties-common
+      state: latest
+      update_cache: true
+
+  - name: Create directory for docker's GPG Key
+    file:
+      path: /etc/apt/keyrings
+      mode: 0755
+      state: directory
+
+  - name: Add Docker's official GPG Key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      # keyring: /etc/apt/keyrings/docker.asc
+      state: present
+
+  - name: Add Docker Repository to Apt Sources
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu focal stable
+      state: present
+
+  - name: Install Docker
+    apt:
+      name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+      state: latest
+      update_cache: true
+
+
+- name: Post-Docker Installation Configuration
+  hosts: server
+  become: true
+  tags: post-config
+
+  tasks:
+  - name: Create Docker Group
+    group:
+      name: docker
+      state: present
+
+  - name: Add user to Docker Group
+    user:
+      name: ubuntu
+      append: true
+      groups: docker
+
+  - name: Reset Connection to allow the user modifications to take effect
+    meta: reset_connection
