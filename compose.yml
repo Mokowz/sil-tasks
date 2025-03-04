@@ -38,7 +38,7 @@ services:
     depends_on:
       - prometheus
     env_file:
-      - .env
+      - ~/sil-tasks/.env
 
 volumes:
   booksonly-data:
